@@ -6,6 +6,7 @@ import com.albaraka.digital.model.entity.Operation;
 import com.albaraka.digital.model.enums.OperationStatus;
 import com.albaraka.digital.repository.DocumentRepository;
 import com.albaraka.digital.repository.OperationRepository;
+import com.albaraka.digital.service.DocumentStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
