@@ -5,10 +5,13 @@ import com.albaraka.digital.model.entity.Operation;
 import com.albaraka.digital.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -68,5 +71,20 @@ public class DocumentStorageService {
         if (filename == null) return null;
         int idx = filename.lastIndexOf('.');
         return (idx != -1 && idx < filename.length() - 1) ? filename.substring(idx + 1) : null;
+    }
+
+    public Resource loadAsResource(String storagePath) {
+        try {
+            Path file = Paths.get(storagePath);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new IllegalArgumentException("Fichier introuvable ou illisible: " + storagePath);
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Chemin de fichier invalide: " + storagePath, e);
+        }
     }
 }
