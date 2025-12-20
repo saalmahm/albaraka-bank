@@ -43,4 +43,9 @@ public class AdminUserController {
     public AdminUserSummary getUser(@PathVariable Long id) {
         return adminUserService.getUserById(id);
     }
+
+    @DeleteMapping("/{id}")
+    public void deactivateUser(@PathVariable Long id) {
+        adminUserService.deactivateUser(id);
+    }
 }
