@@ -1,8 +1,8 @@
 package com.albaraka.digital.exception;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -16,12 +16,26 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(
             HttpServletRequest request,
             HttpServletResponse response,
-            AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            AccessDeniedException accessDeniedException
+    ) throws IOException {
 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        HttpStatus status = HttpStatus.FORBIDDEN;
+
+        String body = """
+            {
+              "status": %d,
+              "error": "%s",
+              "message": "Accès refusé pour ce rôle",
+              "path": "%s"
+            }
+            """.formatted(
+                status.value(),
+                status.getReasonPhrase(),
+                request.getRequestURI()
+        );
+
+        response.setStatus(status.value());
         response.setContentType("application/json");
-        response.getWriter().write("""
-                { "error": "Forbidden", "message": "Accès refusé pour ce rôle" }
-                """);
+        response.getWriter().write(body);
     }
 }
