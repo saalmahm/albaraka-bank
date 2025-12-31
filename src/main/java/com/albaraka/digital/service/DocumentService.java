@@ -7,6 +7,8 @@ import com.albaraka.digital.model.enums.OperationStatus;
 import com.albaraka.digital.repository.DocumentRepository;
 import com.albaraka.digital.repository.OperationRepository;
 import com.albaraka.digital.service.DocumentStorageService;
+import com.albaraka.digital.dto.ai.AiDecisionResult;
+import com.albaraka.digital.service.ai.AiOperationAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class DocumentService {
     private final AccountService accountService;
     private final DocumentStorageService storageService;
     private final DocumentRepository documentRepository;
+    private final AiOperationAnalysisService aiOperationAnalysisService; 
 
     // =========================
     //       CÔTÉ CLIENT
@@ -43,7 +46,19 @@ public class DocumentService {
             throw new IllegalArgumentException("Le justificatif ne peut être ajouté que pour une opération PENDING");
         }
 
-        return storageService.storeDocumentForOperation(op, file);
+        // 1) Stocker le justificatif
+        Document storedDocument = storageService.storeDocumentForOperation(op, file);
+
+        // 2) Lancer l'analyse IA simulée de l'opération
+        AiDecisionResult aiResult = aiOperationAnalysisService.analyze(op);
+
+        // 3) Sauvegarder la recommandation IA sur l'opération
+        op.setAiDecision(aiResult.decision());
+        op.setAiComment(aiResult.comment());
+        op.setAiEvaluatedAt(aiResult.evaluatedAt());
+        operationRepository.save(op);
+
+        return storedDocument;
     }
 
     // =========================
