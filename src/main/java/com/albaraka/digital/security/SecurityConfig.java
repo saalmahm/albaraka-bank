@@ -79,7 +79,7 @@ public class SecurityConfig {
         @Order(2)
         public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/auth/**", "/api/**")   // 🔴 AJOUT
+                .securityMatcher("/auth/**", "/api/**")  
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -108,7 +108,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/logout").permitAll()
-                        // /post-login nécessite un utilisateur déjà authentifié
                         .requestMatchers("/client/**").hasRole("CLIENT")
                         .requestMatchers("/agent/**").hasRole("AGENT_BANCAIRE")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
